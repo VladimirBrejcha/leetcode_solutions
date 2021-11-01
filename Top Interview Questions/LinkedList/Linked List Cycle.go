@@ -1,7 +1,5 @@
 // https://leetcode.com/explore/interview/card/top-interview-questions-easy/93/linked-list/773/
 
-Long runtime solition
-
 /**
  * Definition for singly-linked list.
  * type ListNode struct {
@@ -9,6 +7,9 @@ Long runtime solition
  *     Next *ListNode
  * }
  */
+
+// O(n^2) and O(1) memory
+
 func hasCycle(head *ListNode) bool {
     
     dummy := ListNode{-1, head}
@@ -33,6 +34,31 @@ func hasCycle(head *ListNode) bool {
             
             dummyNext = dummyNext.Next
         }
+        
+        next = next.Next
+    }
+    
+    return false
+}
+
+// O(n) and O(n) memory
+
+func hasCycle(head *ListNode) bool {
+    
+    histogram := make(map[*ListNode]bool)
+    
+    next := head
+    for next != nil {
+        
+        if next.Next == nil {
+            return false
+        }
+        
+        if histogram[next] == true {
+            return true
+        }
+        
+        histogram[next] = true
         
         next = next.Next
     }
