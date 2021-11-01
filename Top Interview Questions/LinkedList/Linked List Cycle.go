@@ -65,3 +65,25 @@ func hasCycle(head *ListNode) bool {
     
     return false
 }
+
+// O(n) and O(1) memory
+
+func hasCycle(head *ListNode) bool {
+    if head == nil || head.Next == nil {
+        return false
+    }
+    slower := head
+    faster := head
+    faster = faster.Next
+    
+    for faster.Next != nil && faster.Next.Next != nil {
+        if faster == slower {
+            return true
+        }
+        
+        faster = faster.Next.Next
+        slower = slower.Next
+    }
+    
+    return false
+}
