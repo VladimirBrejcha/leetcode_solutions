@@ -9,7 +9,8 @@
  * }
  */
 
-// VERY slow
+// first attempt, works but VERY slow
+
 func isSymmetric(root *TreeNode) bool {
     queue := make([]*TreeNode, 0)
     queue = append(queue, root)
@@ -92,5 +93,35 @@ func isSymmetric(root *TreeNode) bool {
         queue = nextBreadthQueue
     }
 
+    return true
+}
+
+// Final solution, clean and fast
+
+func isSymmetric(root *TreeNode) bool {
+    queue := []*TreeNode{root.Left, root.Right}
+    
+    for len(queue) > 0 {
+        node1 := queue[0]
+        node2 := queue[1]
+        
+        queue = queue[2:]
+        
+        if node1 == nil && node2 == nil {
+            continue
+        }
+        if node1 == nil && node2 != nil || node2 == nil && node1 != nil {
+            return false
+        }
+        if node1.Val != node2.Val {
+            return false
+        }
+        
+        queue = append(queue, node1.Left)
+        queue = append(queue, node2.Right)
+        queue = append(queue, node1.Right)
+        queue = append(queue, node2.Left)
+    }
+    
     return true
 }
