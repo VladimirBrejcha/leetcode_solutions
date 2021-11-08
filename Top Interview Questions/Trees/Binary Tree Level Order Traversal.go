@@ -9,8 +9,9 @@
  * }
  */
 func levelOrder(root *TreeNode) [][]int {
+    if root == nil { return [][]int{} }
+    
     var result [][]int = make([][]int, 0)
-    if root == nil { return result }
     result = append(result, []int{root.Val})
     
     var queue []*TreeNode = make([]*TreeNode, 0)
@@ -37,7 +38,9 @@ func levelOrder(root *TreeNode) [][]int {
         if len(breadthValues) > 0 {
             result = append(result, breadthValues)
         }
+        
         queue = nextBreadthQueue
+        
         if len(nextBreadthQueue) == 0 {
             break
         }
