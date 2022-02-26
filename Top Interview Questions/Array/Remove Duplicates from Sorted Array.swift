@@ -40,3 +40,21 @@ class Solution {
         return nums.count
     }
 }
+
+// better
+
+class Solution {
+    func removeDuplicates(_ nums: inout [Int]) -> Int {
+
+        var uniq = 1
+        
+        for i in 1..<nums.count {
+            if nums[i-1] != nums[i] {
+                nums[uniq] = nums[i]
+                uniq += 1
+            }
+        }
+        
+        return uniq
+    }
+}
