@@ -38,3 +38,23 @@ class Solution {
         return profit
     }
 }
+
+// faster
+
+class Solution {
+    func maxProfit(_ prices: [Int]) -> Int {
+        
+        var profit = 0
+        
+        for i in 1..<prices.count {
+            let prev = prices[i - 1]
+            let current = prices[i]
+            
+            if current > prev {
+                profit += current - prev
+            }
+        }
+        
+        return profit
+    }
+}
