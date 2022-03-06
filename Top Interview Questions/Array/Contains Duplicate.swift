@@ -14,3 +14,19 @@ class Solution {
         return false
     }
 }
+
+class Solution {
+    func containsDuplicate(_ nums: [Int]) -> Bool {
+        if nums.count == 1 { return false }
+        
+        var histogram: Set<Int> = []
+        
+        for num in nums {
+            let (uniq, _) = histogram.insert(num)
+            if !uniq {
+                return true
+            }
+        }
+        return false
+    }
+}
