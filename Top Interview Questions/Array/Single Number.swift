@@ -14,3 +14,14 @@ class Solution {
         return histogram.first!.key
     }
 }
+
+// O(n) time and O(1) memory
+class Solution {
+    func singleNumber(_ nums: [Int]) -> Int {
+      var xor = 0
+      for num in nums {
+         xor ^= num
+      }
+      return xor
+    }
+}
