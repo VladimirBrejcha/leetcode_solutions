@@ -24,3 +24,31 @@ class Solution {
         return intersection
     }
 }
+
+class Solution {
+   func intersect(_ nums1: [Int], _ nums2: [Int]) -> [Int] {
+      var intersection = [Int]()
+
+      let a = nums1.sorted()
+      let b = nums2.sorted()
+
+      var a_i = 0
+      var b_i = 0
+
+      while (a_i < a.count && b_i < b.count) {
+         if a[a_i] == b[b_i] {
+            intersection.append(a[a_i])
+            a_i += 1
+            b_i += 1
+         } else {
+            if a[a_i] > b[b_i] {
+               b_i += 1
+            } else {
+               a_i += 1
+            }
+         }
+      }
+
+      return intersection
+   }
+}
