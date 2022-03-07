@@ -52,3 +52,23 @@ class Solution {
       return intersection
    }
 }
+
+class Solution {
+   func intersect(_ nums1: [Int], _ nums2: [Int]) -> [Int] {
+      let a = nums1.reduce(into: [Int:Int]()) { partialResult, num in
+         partialResult[num, default: 0] += 1
+      }
+      return nums2
+         .reduce(into: [Int:Int]()) { partialResult, num in
+            partialResult[num, default: 0] += 1
+         }
+         .reduce(into: [Int]()) { partialResult, dict in
+            if a[dict.key] == nil { return }
+            partialResult.append(
+               contentsOf: Array(
+                  repeating: dict.key, count: min(dict.value, a[dict.key]!)
+               )
+            )
+         }
+   }
+}
