@@ -2,6 +2,22 @@
 
 class Solution {
     func moveZeroes(_ nums: inout [Int]) {
+        var numberOfZeroes = 0
+        var i = 0
+        while (i < nums.count - numberOfZeroes) {
+            if nums[i] == 0 {
+                nums.remove(at: i)
+                nums.append(0)
+                numberOfZeroes += 1
+            } else {
+                i += 1
+            }
+        }
+    }
+}
+
+class Solution {
+    func moveZeroes(_ nums: inout [Int]) {
         if nums.count == 1 { return }
         
         var slow: Int?
