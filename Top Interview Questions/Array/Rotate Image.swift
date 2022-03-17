@@ -14,3 +14,24 @@ class Solution {
         matrix = anotherMatrix
     }
 }
+
+// With queue
+class Solution {
+    func rotate(_ matrix: inout [[Int]]) {        
+        
+        let size = matrix.count
+        var queue = Array<Int>()
+        
+        for i in 0..<size {
+            for j in 0..<size {
+                queue.append(matrix[j][size - 1 - i])
+            }
+        }
+        
+        for i in 0..<size {
+            for j in 0..<size {
+                matrix[size - 1 - i][size - 1 - j] = queue.removeFirst()
+            }
+        }
+    }
+}
