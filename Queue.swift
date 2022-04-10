@@ -45,27 +45,19 @@ struct Queue<Element>:
    // MARK: - CustomStringConvertible
 
    var description: String {
-      var head = head
-      var result: String = "["
-      while head != nil {
-         result.append(String(describing: head!.element))
-         if head?.next != nil { result.append(", ") }
-         head = head?.next
+      guard let head = head else {
+         return "Empty queue"
       }
-      result.append("]")
-      return result
+      return head.description
    }
 
    // MARK: - CustomDebugStringConvertible
 
    var debugDescription: String {
-      var count = 0
-      var next = head
-      while next != nil {
-         count += 1
-         next = next?.next
+      guard let head = head else {
+         return "Empty queue"
       }
-      return ("\(count) \(count == 1 ? "element" : "elements")")
+      return head.description
    }
 
    // MARK: - CustomReflectable
@@ -106,13 +98,19 @@ extension Queue {
 }
 
 extension Queue {
-   class Node<Element> {
+   class Node<Element>: CustomStringConvertible {
       let element: Element
-      var next: Node<Element>?
+      var next: Node<Element>? = nil
 
-      init(element: Element, next: Node<Element>? = nil) {
+      init(element: Element) {
          self.element = element
-         self.next = next
+      }
+
+      // MARK: - CustomStringConvertible
+
+      var description: String {
+         guard let next = next else { return "\(element)" }
+         return "\(element) -> \(next)"
       }
    }
 }
@@ -164,3 +162,6 @@ dump(queueD)
 for element in queueD {
    print(element)
 }
+
+print(String(reflecting: queueD))
+
