@@ -3,14 +3,31 @@ struct Queue<Element>:
    CustomStringConvertible,
    CustomDebugStringConvertible,
    CustomReflectable,
-   Sequence
+   Sequence,
+   Collection
 {
+   class Node<Value>: CustomStringConvertible {
+      let value: Value
+      var next: Node<Value>? = nil
+
+      init(value: Value) {
+         self.value = value
+      }
+
+      // MARK: - CustomStringConvertible
+
+      var description: String {
+         guard let next = next else { return "\(value)" }
+         return "\(value) -> \(next)"
+      }
+   }
+
    private var head: Node<Element>?
    private var tail: Node<Element>?
 
    mutating func enqueue(_ element: Element) {
       let oldTail = tail
-      self.tail = Node(element: element)
+      self.tail = Node(value: element)
       if head == nil {
          head = tail
       } else {
@@ -26,14 +43,14 @@ struct Queue<Element>:
          self.head = head.next
          if head.next == nil { tail = nil }
       }
-      return head.element
+      return head.value
    }
 
    func peek() -> Element? {
       guard let head = head else {
          return nil
       }
-      return head.element
+      return head.value
    }
 
    // MARK: - ExpressibleByArrayLiteral
@@ -65,24 +82,13 @@ struct Queue<Element>:
    var customMirror: Mirror {
       Mirror(
          self,
-         children: { () -> KeyValuePairs<String, Any> in
-            if let head = head, let tail = tail {
-               return ["head": head.element, "tail": tail.element]
-            } else {
-               return [:]
-            }
-         }()
+         unlabeledChildren: self,
+         displayStyle: .collection
       )
    }
 
    // MARK: - Sequence
 
-   func makeIterator() -> Iterator {
-      Iterator(current: head)
-   }
-}
-
-extension Queue {
    struct Iterator: IteratorProtocol {
       var current: Node<Element>?
 
@@ -91,29 +97,61 @@ extension Queue {
             return nil
          } else {
             defer { current = current?.next }
-            return current?.element
+            return current?.value
          }
       }
    }
-}
 
-extension Queue {
-   class Node<Element>: CustomStringConvertible {
-      let element: Element
-      var next: Node<Element>? = nil
+   func makeIterator() -> Iterator {
+      Iterator(current: head)
+   }
 
-      init(element: Element) {
-         self.element = element
+   // MARK: - Collection
+
+   struct Index: Comparable {
+
+      var node: Node<Element>?
+
+      // MARK: - Comparable
+
+      static func < (lhs: Queue<Element>.Index, rhs: Queue<Element>.Index) -> Bool {
+         guard lhs != rhs else {
+            return false
+         }
+         let nodes = sequence(first: lhs.node) { $0?.next }
+         return nodes.contains { $0 === rhs.node }
       }
 
-      // MARK: - CustomStringConvertible
-
-      var description: String {
-         guard let next = next else { return "\(element)" }
-         return "\(element) -> \(next)"
+      static func == (lhs: Queue<Element>.Index, rhs: Queue<Element>.Index) -> Bool {
+         switch (lhs.node, rhs.node) {
+         case let (left?, right?):
+            return left.next === right.next
+         case (nil, nil):
+            return true
+         default:
+            return false
+         }
       }
    }
+
+   subscript(position: Index) -> Element {
+      position.node!.value
+   }
+
+   var startIndex: Index {
+      Index(node: head)
+   }
+
+   var endIndex: Index {
+      Index(node: tail)
+   }
+
+   func index(after i: Index) -> Index {
+      Index(node: i.node?.next)
+   }
 }
+
+// MARK: - Equatable
 
 extension Queue: Equatable where Element: Equatable {
    static func == (lhs: Queue<Element>, rhs: Queue<Element>) -> Bool {
@@ -121,7 +159,7 @@ extension Queue: Equatable where Element: Equatable {
       var rhsNext = rhs.head
       repeat {
          if lhsNext == nil && rhsNext == nil { return true }
-         if lhsNext?.element != rhsNext?.element {
+         if lhsNext?.value != rhsNext?.value {
             return false
          }
          lhsNext = lhsNext?.next
@@ -130,11 +168,13 @@ extension Queue: Equatable where Element: Equatable {
    }
 }
 
+// MARK: - Hashable
+
 extension Queue: Hashable where Element: Hashable {
    func hash(into hasher: inout Hasher) {
       var next = head
       while next != nil {
-         hasher.combine(next?.element)
+         hasher.combine(next?.value)
          next = next?.next
       }
    }
@@ -152,8 +192,8 @@ print(queueA.peek())
 let queueB: Queue<Int> = [1, 2, 3]
 print(queueB)
 
-let queueC: Queue<Int> = [1, 3]
-let queueD: Queue<Int> = [1, 2, 3]
+let queueC: Queue<Int> = [1, 2]
+let queueD: Queue<Int> = [1, 2]
 print(queueC == queueD)
 print(queueC.hashValue == queueD.hashValue)
 
@@ -165,3 +205,6 @@ for element in queueD {
 
 print(String(reflecting: queueD))
 
+let queueV: Queue<Int> = [0,1,2,3,4,5]
+let indexOfThirdElement = queueV.index(queueV.startIndex, offsetBy: 2)
+print(queueV[indexOfThirdElement])
