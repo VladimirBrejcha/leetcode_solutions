@@ -22,10 +22,11 @@ struct Queue<Element>:
       }
    }
 
-   private var head: Node<Element>?
+   fileprivate var head: Node<Element>?
    private var tail: Node<Element>?
 
    mutating func enqueue(_ element: Element) {
+      copy()
       let oldTail = tail
       self.tail = Node(value: element)
       if head == nil {
@@ -36,6 +37,7 @@ struct Queue<Element>:
    }
 
    @discardableResult mutating func dequeue() -> Element? {
+      copy()
       guard let head = head else {
          return nil
       }
@@ -65,7 +67,7 @@ struct Queue<Element>:
       guard let head = head else {
          return "Empty queue"
       }
-      return head.description
+      return "[\(head.description)]"
    }
 
    // MARK: - CustomDebugStringConvertible
@@ -74,7 +76,7 @@ struct Queue<Element>:
       guard let head = head else {
          return "Empty queue"
       }
-      return head.description
+      return "[\(head.description)]"
    }
 
    // MARK: - CustomReflectable
@@ -149,6 +151,30 @@ struct Queue<Element>:
    func index(after i: Index) -> Index {
       Index(node: i.node?.next)
    }
+
+   // MARK: - Copying
+
+   private mutating func copy() {
+      guard !isKnownUniquelyReferenced(&head) else {
+         return
+      }
+
+      guard var oldHead = head else {
+         return
+      }
+
+      head = Node(value: oldHead.value)
+      var newHead = head
+
+      while let nextOldHead = oldHead.next {
+         newHead!.next = Node(value: nextOldHead.value)
+         newHead = newHead!.next
+
+         oldHead = nextOldHead
+      }
+
+      tail = newHead
+   }
 }
 
 // MARK: - Equatable
@@ -180,31 +206,95 @@ extension Queue: Hashable where Element: Hashable {
    }
 }
 
+// MARK: - Tests -
+
+// MARK: - Accessors Tests
+
+print("=== Accessors Tests ===")
+
 var queueA: Queue<Int> = Queue()
+print("Create empty queue:")
 print(queueA)
+print("Enqueue 1:")
 queueA.enqueue(1)
 print(queueA)
+print("Enqueue 2:")
 queueA.enqueue(2)
 print(queueA)
-print(queueA.dequeue())
+print("Dequeue:")
+print(queueA.dequeue()!)
 print(queueA)
-print(queueA.peek())
+print("Peek:")
+print(queueA.peek()!)
+
+// MARK: - ExpressibleByArrayLiteral Tests
+
+print("=== ExpressibleByArrayLiteral Tests ===")
+
 let queueB: Queue<Int> = [1, 2, 3]
+print("Create [1, 2, 3] queue:")
 print(queueB)
 
+// MARK: - Equatable & Hashable Tests
+
+print("=== Equatable & Hashable Tests ===")
+
+print("Create two [1, 2] queues")
 let queueC: Queue<Int> = [1, 2]
 let queueD: Queue<Int> = [1, 2]
+print("Check equality:")
 print(queueC == queueD)
+print("Check equality of hashes:")
 print(queueC.hashValue == queueD.hashValue)
 
-dump(queueD)
+// MARK: - Sequence Tests
 
+print("=== Sequence Tests ===")
+
+print("all elements of queue [1, 2]")
 for element in queueD {
    print(element)
 }
 
+// MARK: - Debug logging tests
+
+print("=== Debug logging tests ===")
+
+print("dump [1, 2] queue:")
+dump(queueD)
+print("reflect [1, 2] queue:")
 print(String(reflecting: queueD))
 
-let queueV: Queue<Int> = [0,1,2,3,4,5]
+// MARK: - Collection Indexes Tests
+
+print("=== Collection Indexes Tests ===")
+
+print("Create [0, 1, 2, 3, 4, 5] queue")
+let queueV: Queue<Int> = [0, 1, 2, 3, 4, 5]
+print("Get index of startIndex + 2")
 let indexOfThirdElement = queueV.index(queueV.startIndex, offsetBy: 2)
+print("Element at index:")
 print(queueV[indexOfThirdElement])
+
+// MARK: - Copy On Write Tests
+
+print("=== Copy On Write Tests ===")
+
+let queue1: Queue<Int> = [1, 2]
+var queue2 = queue1
+
+print("queue1: \(queue1)")
+print("queue2: \(queue2)")
+
+print("enqueue 3 to queue2")
+queue2.enqueue(3)
+print("queue1: \(queue1)")
+print("queue2: \(queue2)")
+
+print("dequeue from queue2")
+queue2.dequeue()
+print("dequeue from queue2")
+queue2.dequeue()
+print("queue1: \(queue1)")
+print("queue2: \(queue2)")
+
