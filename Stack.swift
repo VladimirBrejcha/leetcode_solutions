@@ -3,7 +3,8 @@ struct Stack<Element>:
    Sequence,
    CustomStringConvertible,
    CustomDebugStringConvertible,
-   CustomReflectable
+   CustomReflectable,
+   Collection
 {
    private var storage: [Element] = []
 
@@ -14,9 +15,7 @@ struct Stack<Element>:
    }
 
    @discardableResult mutating func pop() -> Element? {
-      if storage.isEmpty {
-         return nil
-      }
+      if storage.isEmpty { return nil }
       return storage.removeLast()
    }
 
@@ -28,7 +27,7 @@ struct Stack<Element>:
 
    // MARK: - Sequence
 
-   func makeIterator() -> some IteratorProtocol {
+   func makeIterator() -> Array<Element>.Iterator {
       storage.makeIterator()
    }
 
@@ -46,6 +45,22 @@ struct Stack<Element>:
    // MARK: - CustomReflectable
 
    var customMirror: Mirror { .init(reflecting: storage) }
+
+   // MARK: - Collection
+
+   typealias Index = Array<Element>.Index
+
+   var startIndex: Index { storage.startIndex }
+
+   var endIndex: Index { storage.endIndex }
+
+   func index(after i: Index) -> Index {
+      storage.index(after: i)
+   }
+
+   subscript(position: Array<Element>.Index) -> Element {
+      storage[position]
+   }
 }
 
 extension Stack: Equatable where Element: Equatable { }
